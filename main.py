@@ -11,7 +11,7 @@ except ImportError:
     def get_best_move(board, player, depth):
         return random.choice(get_legal_moves(board))
 
-# Difficulty options: mean how many moves ahead the AI looks.
+# Difficulty options: means how many moves ahead the AI looks.
 DIFFICULTY = {
     '1': ('Easy', 1),
     '2': ('Medium', 3),
