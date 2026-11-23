@@ -28,4 +28,3 @@ def make_move(board, position, player):
     new_board = board.copy()
     new_board[position] = player
     return new_board
-# should print None0

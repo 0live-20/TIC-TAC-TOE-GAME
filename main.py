@@ -1,9 +1,7 @@
 import random
 from game import (create_board, print_board, check_winner,
                   get_legal_moves, make_move)
-
-# Partner B's minimax lives in ai.py. Until it is ready, we fall back to a
-# random AI so you can test the game loop on your own.
+# Try to import the AI module. If it's not found, define a fallback function that makes random moves.
 try:
     from ai import get_best_move
     AI_READY = True
@@ -13,11 +11,11 @@ except ImportError:
     def get_best_move(board, player, depth):
         return random.choice(get_legal_moves(board))
 
-# Difficulty = depth limit passed to minimax
+# Difficulty options: mean how many moves ahead the AI looks.
 DIFFICULTY = {
     '1': ('Easy', 1),
     '2': ('Medium', 3),
-    '3': ('Hard', 9),   # 9 = full depth, so the AI plays perfectly
+    '3': ('Hard', 9),   # 9 = full depth
 }
 
 

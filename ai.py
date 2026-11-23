@@ -2,7 +2,6 @@ import random
 from game import check_winner, get_legal_moves, make_move
 
 # Counts how many board positions were examined.
-# Partner B can use this in experiments.py to compare minimax vs alpha-beta.
 nodes_expanded = 0
 
 
@@ -44,7 +43,7 @@ def alphabeta(board, current, ai, depth, alpha, beta):
     if result == 'draw' or depth == 0:
         return 0
 
-    if current == ai:                       # maximizing
+    if current == ai:  # maximizing
         best = float('-inf')
         for move in get_legal_moves(board):
             new_board = make_move(board, move, current)
@@ -52,9 +51,9 @@ def alphabeta(board, current, ai, depth, alpha, beta):
                                        depth - 1, alpha, beta))
             alpha = max(alpha, best)
             if beta <= alpha:
-                break                       # prune
+                break   # prune
         return best
-    else:                                   # minimizing
+    else:  # minimizing
         best = float('inf')
         for move in get_legal_moves(board):
             new_board = make_move(board, move, current)
@@ -62,7 +61,7 @@ def alphabeta(board, current, ai, depth, alpha, beta):
                                        depth - 1, alpha, beta))
             beta = min(beta, best)
             if beta <= alpha:
-                break                       # prune
+                break  # prune
         return best
 
 
@@ -88,5 +87,5 @@ def get_best_move(board, player, depth, use_alpha_beta=True):
         elif score == best_score:
             best_moves.append(move)
 
-    # Pick randomly among equally good moves so the AI isn't predictable
+    # Pick randomly equally good moves so the AI isn't predictable
     return random.choice(best_moves)
