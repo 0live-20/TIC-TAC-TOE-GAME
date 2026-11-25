@@ -7,136 +7,95 @@
 # AI: O
 # =====================================================
 
-from game import check_winner, check_draw
+import random
+from game import check_winner, get_legal_moves, make_move
+
+# Counts how many board positions were examined.
+# Partner B can use this in experiments.py to compare minimax vs alpha-beta.
+nodes_expanded = 0
 
 
-# STEP 1: MINIMAX ALGORITHM
+def other(player):
+    return 'O' if player == 'X' else 'X'
 
-def minimax(board, depth, is_maximizing):
-    """
-    Minimax algorithm evaluates possible future moves
-    and returns the best score for the AI.
 
-    Parameters:
-        board: Current Tic-Tac-Toe board
-        depth: Number of moves explored
-        is_maximizing: True when AI is playing
+def minimax(board, current, ai, depth):
+    """Plain minimax. Scores are from the AI's point of view."""
+    global nodes_expanded
+    nodes_expanded += 1
 
-    Returns:
-        Best possible score
-    """
-
-    winner = check_winner(board)
-
-    # AI wins
-    if winner == "O":
-        return 10 - depth
-
-    # Human wins
-    elif winner == "X":
-        return depth - 10
-
-    # Game ends in a draw
-    elif check_draw(board):
+    result = check_winner(board)
+    if result == ai:
+        return 10 + depth          # win sooner = better
+    if result == other(ai):
+        return -10 - depth         # lose later = better
+    if result == 'draw' or depth == 0:
         return 0
 
-    # AI maximizes the score
-    if is_maximizing:
+    scores = []
+    for move in get_legal_moves(board):
+        new_board = make_move(board, move, current)
+        scores.append(minimax(new_board, other(current), ai, depth - 1))
 
-        best_score = float("-inf")
-
-        for i in range(9):
-
-            if board[i] == " ":
-
-                # Try an AI move
-                board[i] = "O"
-
-                # Explore the opponent's response
-                score = minimax(board, depth + 1, False)
-
-                # Undo the move
-                board[i] = " "
-
-                best_score = max(best_score, score)
-
-        return best_score
-
-    # Human minimizes the AI's score
-    else:
-
-        best_score = float("inf")
-
-        for i in range(9):
-
-            if board[i] == " ":
-
-                # Try a human move
-                board[i] = "X"
-
-                # Explore the AI's response
-                score = minimax(board, depth + 1, True)
-
-                # Undo the move
-                board[i] = " "
-
-                best_score = min(best_score, score)
-
-        return best_score
+    return max(scores) if current == ai else min(scores)
 
 
-# STEP 2: FIND THE BEST AI MOVE
+def alphabeta(board, current, ai, depth, alpha, beta):
+    """Minimax with alpha-beta pruning. Gives the same result, but faster."""
+    global nodes_expanded
+    nodes_expanded += 1
 
-def get_best_move(board):
+    result = check_winner(board)
+    if result == ai:
+        return 10 + depth
+    if result == other(ai):
+        return -10 - depth
+    if result == 'draw' or depth == 0:
+        return 0
+
+    if current == ai:                       # maximizing
+        best = float('-inf')
+        for move in get_legal_moves(board):
+            new_board = make_move(board, move, current)
+            best = max(best, alphabeta(new_board, other(current), ai,
+                                       depth - 1, alpha, beta))
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break                       # prune
+        return best
+    else:                                   # minimizing
+        best = float('inf')
+        for move in get_legal_moves(board):
+            new_board = make_move(board, move, current)
+            best = min(best, alphabeta(new_board, other(current), ai,
+                                       depth - 1, alpha, beta))
+            beta = min(beta, best)
+            if beta <= alpha:
+                break                       # prune
+        return best
+
+
+def get_best_move(board, player, depth, use_alpha_beta=True):
+    """Returns the best cell index (0-8) for `player` within `depth` moves.
+
+    main.py calls this as get_best_move(board, ai_symbol, depth).
     """
-    Evaluates all available positions and returns
-    the position with the highest Minimax score.
+    best_score = float('-inf')
+    best_moves = []
 
-    Returns:
-        Index of the best move, or None if no moves exist.
-    """
+    for move in get_legal_moves(board):
+        new_board = make_move(board, move, player)
+        if use_alpha_beta:
+            score = alphabeta(new_board, other(player), player, depth - 1,
+                              float('-inf'), float('inf'))
+        else:
+            score = minimax(new_board, other(player), player, depth - 1)
 
-    best_score = float("-inf")
-    best_move = None
+        if score > best_score:
+            best_score = score
+            best_moves = [move]
+        elif score == best_score:
+            best_moves.append(move)
 
-    for i in range(9):
-
-        if board[i] == " ":
-
-            # Temporarily place AI symbol
-            board[i] = "O"
-
-            # Evaluate the move
-            score = minimax(board, 0, False)
-
-            # Restore the original board
-            board[i] = " "
-
-            # Keep the best-scoring move
-            if score > best_score:
-
-                best_score = score
-                best_move = i
-
-    return best_move
-
-
-# STEP 3: EXECUTE THE AI MOVE
-
-def ai_move(board):
-    """
-    Makes the AI's selected move on the board.
-
-    Returns:
-        Position selected by the AI, or None if full.
-    """
-
-    best_move = get_best_move(board)
-
-    if best_move is not None:
-
-        board[best_move] = "O"
-
-        return best_move
-
-    return None
+    # Pick randomly among equally good moves so the AI isn't predictable
+    return random.choice(best_moves)

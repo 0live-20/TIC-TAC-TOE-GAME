@@ -3,7 +3,7 @@ from game import (create_board, print_board, check_winner,
                   get_legal_moves, make_move)
 # Try to import the AI module. If it's not found, define a fallback function that makes random moves.
 try:
-    from ai_backup import get_best_move
+    from ai import get_best_move
     AI_READY = True
 except ImportError:
     AI_READY = False
