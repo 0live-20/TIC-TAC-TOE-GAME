@@ -9,7 +9,7 @@ def print_board(board):
     for i in range(0, 9, 3):
         print(' ' + ' | '.join(board[i:i+3]))
         if i < 6:
-            print('---+---+---')
+            print('---+---+---') # prints the board three cells per row, with | and ---+---+--- separators.
 
 def check_winner(board):
     """Returns 'X', 'O', 'draw', or None if the game is still going."""

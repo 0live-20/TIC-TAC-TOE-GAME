@@ -54,7 +54,7 @@ def get_human_move(board):
         elif position not in legal:
             print("That cell is already taken.")
         else:
-            return position
+            return position # checks that the input is a number, it is between 1 and 9, and the cell is free.
 
 
 def show_position_guide():
@@ -116,4 +116,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() #makes the game run when the script is executed directly, but not when imported as a module.

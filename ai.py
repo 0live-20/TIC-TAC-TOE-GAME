@@ -11,7 +11,6 @@ import random
 from game import check_winner, get_legal_moves, make_move
 
 # Counts how many board positions were examined.
-# Partner B can use this in experiments.py to compare minimax vs alpha-beta.
 nodes_expanded = 0
 
 
